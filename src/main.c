@@ -11,9 +11,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define SW_V "sv0a"
+#define SW_V "sv0b"
 
-#define STR_BUF_SIZE    64
+#define STR_BUF_SIZE    128
 #define RGB565_FROM_RGB(r, g, b)    (((uint16_t)r & 0xF8) << 8) | (((uint16_t)g & 0xFC) << 3) | ((uint16_t)b >> 3)
 
 void str_upper(char *str);
@@ -51,6 +51,8 @@ int main(int argc, char **argv)
     char pbOutSourceNameDirectory[STR_BUF_SIZE];
     memset(pbOutSourceNameDirectory, 0x00, STR_BUF_SIZE);
 
+    uint8_t ubDebug = 0;
+
     int c;
     int digit_optind = 0;
 
@@ -60,13 +62,14 @@ int main(int argc, char **argv)
         int option_index = 0;
         static struct option long_options[] = {
             {"help",        no_argument,        0, 'h'},
+            {"debug",       no_argument,        0, 't'},
             {"output",      required_argument,  0, 'o'},
             {"directory",   required_argument,  0, 'd'},
             {"version",     no_argument,        0, 'v'},
             {0,             0,                  0,  0 }
         };
 
-        c = getopt_long(argc, argv, "hvo:d:", long_options, &option_index);
+        c = getopt_long(argc, argv, "hvto:d:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -75,6 +78,10 @@ int main(int argc, char **argv)
         case 'h':
                 print_help(argv[0]);
                 return 0;
+
+        case 't':
+                ubDebug = 1;
+                break;
 
         case 'v':
                 fprintf(stderr, "Version: %s\n", SW_V);
@@ -143,15 +150,18 @@ int main(int argc, char **argv)
         strncpy(pbOutSourceNameDirectory, pbOutSourceName, STR_BUF_SIZE);
     }
 
-    fprintf(stderr, "pbInputFile: %s\n", pbInputFile);
-    fprintf(stderr, "pbOutputDirectory: %s\n", pbOutputDirectory);
-    fprintf(stderr, "pbOutputName: %s\n", pbOutputName);
-    fprintf(stderr, "pbOutVarName: %s\n", pbOutVarName);
-    fprintf(stderr, "pbOutNameMacro: %s\n", pbOutNameMacro);
-    fprintf(stderr, "pbOutHeaderName: %s\n", pbOutHeaderName);
-    fprintf(stderr, "pbOutSourceName: %s\n", pbOutSourceName);
-    fprintf(stderr, "pbOutHeaderNameDirectory: %s\n", pbOutHeaderNameDirectory);
-    fprintf(stderr, "pbOutSourceNameDirectory: %s\n", pbOutSourceNameDirectory);
+    if(ubDebug)
+    {
+        fprintf(stderr, "pbInputFile: %s\n", pbInputFile);
+        fprintf(stderr, "pbOutputDirectory: %s\n", pbOutputDirectory);
+        fprintf(stderr, "pbOutputName: %s\n", pbOutputName);
+        fprintf(stderr, "pbOutVarName: %s\n", pbOutVarName);
+        fprintf(stderr, "pbOutNameMacro: %s\n", pbOutNameMacro);
+        fprintf(stderr, "pbOutHeaderName: %s\n", pbOutHeaderName);
+        fprintf(stderr, "pbOutSourceName: %s\n", pbOutSourceName);
+        fprintf(stderr, "pbOutHeaderNameDirectory: %s\n", pbOutHeaderNameDirectory);
+        fprintf(stderr, "pbOutSourceNameDirectory: %s\n", pbOutSourceNameDirectory);
+    }
 
     FILE *fIn = fopen(pbInputFile, "rb");
     if(fIn == NULL)
@@ -203,7 +213,7 @@ int main(int argc, char **argv)
     fprintf(fOutH, " *\n");
     fprintf(fOutH, " * resolution: %dw x %dh\n", w, h);
     fprintf(fOutH, " * n symbols(16bit): %d\n", w * h);
-    fprintf(fOutH, " * size(bits): %dKbit", (w * h * 16) / 1000);
+    fprintf(fOutH, " * size(bits): %dKbit\n", (w * h * 16) / 1000);
     fprintf(fOutH, " * size(bytes): %dKiB\n", (w * h * 2) / 1024);
     fprintf(fOutH, " */\n\n");
 
