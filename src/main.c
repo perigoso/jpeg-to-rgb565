@@ -66,7 +66,7 @@ int main(int argc, char **argv)
             {0,             0,                  0,  0 }
         };
 
-        c = getopt_long(argc, argv, "hvo:d", long_options, &option_index);
+        c = getopt_long(argc, argv, "hvo:d:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -99,6 +99,8 @@ int main(int argc, char **argv)
                 return -1;
         }
     }
+
+        fprintf(stderr, "pbOutputDirectory: %s\n", pbOutputDirectory);
 
     if((argc - optind) == 1)
     {
@@ -140,17 +142,17 @@ int main(int argc, char **argv)
         strncpy(pbOutHeaderNameDirectory, pbOutHeaderName, STR_BUF_SIZE);
         strncpy(pbOutSourceNameDirectory, pbOutSourceName, STR_BUF_SIZE);
     }
-/*
-    printf("pbInputFile: %s\n", pbInputFile);
-    printf("pbOutputDirectory: %s\n", pbOutputDirectory);
-    printf("pbOutputName: %s\n", pbOutputName);
-    printf("pbOutVarName: %s\n", pbOutVarName);
-    printf("pbOutNameMacro: %s\n", pbOutNameMacro);
-    printf("pbOutHeaderName: %s\n", pbOutHeaderName);
-    printf("pbOutSourceName: %s\n", pbOutSourceName);
-    printf("pbOutHeaderNameDirectory: %s\n", pbOutHeaderNameDirectory);
-    printf("pbOutSourceNameDirectory: %s\n", pbOutSourceNameDirectory);
-*/
+
+    fprintf(stderr, "pbInputFile: %s\n", pbInputFile);
+    fprintf(stderr, "pbOutputDirectory: %s\n", pbOutputDirectory);
+    fprintf(stderr, "pbOutputName: %s\n", pbOutputName);
+    fprintf(stderr, "pbOutVarName: %s\n", pbOutVarName);
+    fprintf(stderr, "pbOutNameMacro: %s\n", pbOutNameMacro);
+    fprintf(stderr, "pbOutHeaderName: %s\n", pbOutHeaderName);
+    fprintf(stderr, "pbOutSourceName: %s\n", pbOutSourceName);
+    fprintf(stderr, "pbOutHeaderNameDirectory: %s\n", pbOutHeaderNameDirectory);
+    fprintf(stderr, "pbOutSourceNameDirectory: %s\n", pbOutSourceNameDirectory);
+
     FILE *fIn = fopen(pbInputFile, "rb");
     if(fIn == NULL)
     {
@@ -200,7 +202,9 @@ int main(int argc, char **argv)
     fprintf(fOutH, " * %s[2:last] = 16bit rgb565 pixel color from top left to bottom right\n", pbOutVarName);
     fprintf(fOutH, " *\n");
     fprintf(fOutH, " * resolution: %dw x %dh\n", w, h);
-    fprintf(fOutH, " * size: %dKbit, %dKiB\n", (w * h * 16) / 1000, (w * h * 2) / 1024);
+    fprintf(fOutH, " * n symbols(16bit): %d\n", w * h);
+    fprintf(fOutH, " * size(bits): %dKbit", (w * h * 16) / 1000);
+    fprintf(fOutH, " * size(bytes): %dKiB\n", (w * h * 2) / 1024);
     fprintf(fOutH, " */\n\n");
 
     fprintf(fOutH, "#ifndef\t__%s_H_\n", pbOutNameMacro);
@@ -216,7 +220,7 @@ int main(int argc, char **argv)
     FILE *fOutC = fopen(pbOutSourceNameDirectory , "w+");
 
     fprintf(fOutC, "#include \"%s\"\n\n", pbOutHeaderName);
-    fprintf(fOutC, "rgb565_t %s[] = { 0x%04X, 0x%04X,\n", pbOutVarName, w, h);
+    fprintf(fOutC, "const rgb565_t %s[] = { 0x%04X, 0x%04X,\n", pbOutVarName, w, h);
     for(uint32_t i = 0; i < w * h; i++)
     {
         fprintf(fOutC, "0x%04X", RGB565_FROM_RGB(data[i * numChannels], data[(i * 3) + 1], data[(i * 3) + 2]));
