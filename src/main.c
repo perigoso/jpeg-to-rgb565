@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     FILE *fOutC = fopen(pbOutSourceNameDirectory , "w+");
 
     fprintf(fOutC, "#include \"%s\"\n\n", pbOutHeaderName);
-    fprintf(fOutC, "const rgb565_t %s[] = { 0x%04X, 0x%04X,\n", pbOutVarName, w, h);
+    fprintf(fOutC, "const rgb565_t %s[] = {\n0x%04X, 0x%04X,\n", pbOutVarName, w, h);
     for(uint32_t i = 0; i < w * h; i++)
     {
         fprintf(fOutC, "0x%04X", RGB565_FROM_RGB(data[i * numChannels], data[(i * 3) + 1], data[(i * 3) + 2]));
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
                 fprintf(fOutC, ", ");
         }
     }
-    fprintf(fOutC, "};\n\n");
+    fprintf(fOutC, "\n};\n\n");
 
     fclose(fOutC);
 
