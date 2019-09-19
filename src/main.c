@@ -107,8 +107,6 @@ int main(int argc, char **argv)
         }
     }
 
-        fprintf(stderr, "pbOutputDirectory: %s\n", pbOutputDirectory);
-
     if((argc - optind) == 1)
     {
         strncpy(pbInputFile, argv[optind++], STR_BUF_SIZE);
